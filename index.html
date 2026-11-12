@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TACTISENSOR — тактильные датчики для роботов и протезов</title>
+<style>
+  :root {
+    --bg: #0B0E14;
+    --card: #151B26;
+    --border: #263042;
+    --cyan: #00E5FF;
+    --amber: #FF5E1A;
+    --text-head: #F8FAFC;
+    --text-body: #94A3B8;
+    --mono: 'JetBrains Mono', 'Roboto Mono', ui-monospace, monospace;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text-body);
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+    background-image:
+      linear-gradient(rgba(38,48,66,0.35) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(38,48,66,0.35) 1px, transparent 1px);
+    background-size: 48px 48px;
+  }
+  .container { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+  .mono { font-family: var(--mono); }
+
+  /* HEADER */
+  header.site {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(11,14,20,0.85);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav { display: flex; align-items: center; justify-content: space-between; height: 64px; }
+  .logo { display: flex; align-items: center; gap: 10px; color: var(--text-head); font-weight: 700; letter-spacing: 0.04em; font-size: 15px; text-decoration: none; }
+  .logo img { height: 28px; width: auto; display: block; }
+  .logo .logo-placeholder {
+    width: 28px; height: 28px; border-radius: 6px;
+    background: linear-gradient(135deg, var(--cyan), var(--amber));
+    display: flex; align-items: center; justify-content: center;
+    color: #0B0E14; font-weight: 800; font-size: 14px;
+  }
+  .nav-links { display: flex; gap: 28px; }
+  .nav-links a { color: var(--text-body); text-decoration: none; font-size: 14px; transition: color .2s; }
+  .nav-links a:hover { color: var(--cyan); }
+  @media (max-width: 720px) { .nav-links { display: none; } }
+
+  /* HERO */
+  .hero { padding: 96px 0 80px; position: relative; overflow: hidden; }
+  .hero-grid { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 48px; align-items: center; }
+  @media (max-width: 900px) { .hero-grid { grid-template-columns: 1fr; } }
+  .hero h1 {
+    font-size: 52px; line-height: 1.1; font-weight: 800;
+    color: var(--text-head); letter-spacing: -0.02em; margin-bottom: 20px;
+  }
+  .hero h1 .accent-cyan { color: var(--cyan); }
+  .hero h1 .accent-amber { color: var(--amber); }
+  @media (max-width: 640px) { .hero h1 { font-size: 36px; } }
+  .hero p.sub { font-size: 19px; max-width: 560px; margin-bottom: 32px; }
+  .badges { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 32px; }
+  .badge {
+    font-size: 12px; padding: 6px 12px; border-radius: 999px;
+    border: 1px solid var(--border); color: var(--text-body);
+    background: var(--card);
+  }
+  .badge.resident { border-color: rgba(0,229,255,0.35); color: var(--cyan); }
+
+  /* CTA with fingerprint */
+  .cta {
+    position: relative; display: inline-flex; align-items: center; gap: 12px;
+    background: var(--amber); color: #0B0E14;
+    padding: 16px 28px; border-radius: 10px;
+    font-weight: 700; font-size: 16px; text-decoration: none;
+    transition: transform .2s, box-shadow .2s;
+    box-shadow: 0 0 0 0 rgba(255,94,26,0.4);
+  }
+  .cta:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(255,94,26,0.25); }
+  .cta .fp {
+    width: 22px; height: 22px; position: relative; flex-shrink: 0;
+    border-radius: 50%;
+    background:
+      radial-gradient(circle at 50% 50%, transparent 30%, #0B0E14 31%, #0B0E14 34%, transparent 35%),
+      radial-gradient(circle at 50% 50%, transparent 48%, #0B0E14 49%, #0B0E14 52%, transparent 53%),
+      radial-gradient(circle at 50% 50%, transparent 66%, #0B0E14 67%, #0B0E14 70%, transparent 71%);
+  }
+
+  /* HERO VISUAL (place for 3D / photo) */
+  .hero-visual {
+    position: relative; aspect-ratio: 1 / 1;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .hero-visual::before {
+    content: ""; position: absolute; inset: 0;
+    background: radial-gradient(circle at 50% 55%, rgba(0,229,255,0.18) 0%, transparent 45%),
+                radial-gradient(circle at 55% 50%, rgba(255,94,26,0.16) 0%, transparent 40%);
+    pointer-events: none;
+  }
+  .hero-visual .placeholder-text {
+    position: relative; z-index: 1; text-align: center; padding: 24px;
+    color: var(--text-body); font-size: 13px;
+  }
+  .hero-visual .placeholder-text strong { display: block; color: var(--text-head); font-size: 15px; margin-bottom: 6px; }
+
+  /* SECTIONS */
+  section { padding: 80px 0; }
+  h2 {
+    font-size: 34px; font-weight: 800; color: var(--text-head);
+    letter-spacing: -0.01em; margin-bottom: 16px;
+  }
+  .lead { font-size: 17px; max-width: 780px; }
+  .lead + .lead { margin-top: 14px; }
+
+  /* CARDS */
+  .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-top: 36px; }
+  .card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; padding: 28px;
+    transition: border-color .2s, transform .2s;
+  }
+  .card:hover { border-color: rgba(0,229,255,0.4); transform: translateY(-2px); }
+  .card h3 { color: var(--text-head); font-size: 19px; margin-bottom: 10px; }
+  .card p { font-size: 15px; }
+  .card .tag { font-size: 12px; color: var(--cyan); font-family: var(--mono); letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 8px; display: block; }
+
+  /* HEATMAP / 3 STEPS */
+  .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; margin-top: 36px; }
+  .step {
+    background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 24px;
+    position: relative;
+  }
+  .step .num {
+    font-family: var(--mono); font-size: 13px; color: var(--cyan);
+    letter-spacing: 0.1em; margin-bottom: 10px;
+  }
+  .step h3 { color: var(--text-head); font-size: 17px; margin-bottom: 8px; }
+  .step p { font-size: 14px; }
+
+  /* KPI / HYPOTHESIS */
+  .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-top: 36px; }
+  .kpi {
+    background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+    padding: 24px; text-align: left;
+  }
+  .kpi .label { font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-body); margin-bottom: 8px; }
+  .kpi .value { font-family: var(--mono); font-size: 40px; font-weight: 700; color: var(--cyan); line-height: 1; }
+  .kpi .value.amber { color: var(--amber); }
+  .kpi .note { font-size: 12px; margin-top: 10px; color: #64748b; font-style: italic; }
+
+  /* HISTORY CARDS */
+  .eras { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-top: 36px; }
+  .era {
+    background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 20px;
+  }
+  .era .years { font-family: var(--mono); font-size: 12px; color: var(--cyan); margin-bottom: 6px; }
+  .era h3 { color: var(--text-head); font-size: 16px; margin-bottom: 6px; }
+  .era p { font-size: 13px; }
+
+  /* FOR WHOM TAGS */
+  .tags { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 24px; }
+  .tag-pill {
+    padding: 9px 16px; border-radius: 999px; font-size: 14px;
+    border: 1px solid var(--border); color: var(--text-body); background: var(--card);
+    transition: color .2s, border-color .2s;
+  }
+  .tag-pill:hover { color: var(--cyan); border-color: rgba(0,229,255,0.4); }
+
+  /* CONTACTS */
+  .contacts { background: var(--card); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+  .contacts h2 { color: var(--text-head); }
+  .contacts .big-link {
+    display: inline-block; font-family: var(--mono); font-size: 20px;
+    color: var(--cyan); text-decoration: none; margin-top: 12px;
+  }
+  .contacts .big-link:hover { text-decoration: underline; }
+  .contacts .contact-line { margin-top: 8px; }
+  .contacts .contact-line a { color: var(--cyan); text-decoration: none; }
+
+  /* FOOTER */
+  footer { padding: 32px 0; text-align: center; font-size: 13px; color: #64748b; border-top: 1px solid var(--border); }
+
+  /* DISCLAIMER */
+  .disclaimer {
+    margin-top: 24px; padding: 14px 18px; border-left: 3px solid var(--amber);
+    background: rgba(255,94,26,0.05); font-size: 13px; color: var(--text-body); border-radius: 0 8px 8px 0;
+  }
+
+  @media (max-width: 640px) {
+    section { padding: 56px 0; }
+    h2 { font-size: 26px; }
+    .hero { padding: 64px 0 56px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="site">
+  <div class="container nav">
+    <a href="#" class="logo">
+      <!-- ЗАМЕНИТЕ этот placeholder на ваш логотип: <img src="logo.svg" alt="TACTISENSOR"> -->
+      <span class="logo-placeholder">T</span>
+      TACTISENSOR
+    </a>
+    <nav class="nav-links">
+      <a href="#about">О проекте</a>
+      <a href="#solution">Решение</a>
+      <a href="#history">История точности</a>
+      <a href="#forwhom">Для кого</a>
+      <a href="#contact">Контакты</a>
+    </nav>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="container hero-grid">
+    <div>
+      <h1>Осязание для <span class="accent-cyan">роботов</span> и <span class="accent-amber">протезов</span></h1>
+      <p class="sub">Тактильные датчики, которые дают машине чувство касания — усилие, точку контакта и момент, когда предмет начинает выскальзывать. Без этого гуманоид не может выполнять тонкую работу, а протез остаётся инструментом, а не частью тела.</p>
+      <div class="badges">
+        <span class="badge resident">Резидент КРИТБИ</span>
+        <span class="badge resident">Резидент Сколково</span>
+        <span class="badge">Лауреат премии «Промышленная робототехника — 2026»</span>
+        <span class="badge">Номинант «Бизнес.Лидеры»</span>
+      </div>
+      <a href="#contact" class="cta">
+        <span class="fp" aria-hidden="true"></span>
+        Обсудить сотрудничество
+      </a>
+    </div>
+    <div class="hero-visual">
+      <div class="placeholder-text">
+        <strong>Место под 3D-модель или фото</strong>
+        Здесь будет heatmap-визуализация: роботизированная кисть касается хрупкого объекта, свечение от циана к янтарю в точке контакта.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="container">
+    <h2>О проекте</h2>
+    <p class="lead">ООО «ИнтеллектСистемы» — красноярский DeepTech-стартап. Мы разрабатываем тактильную сенсорику для промышленных роботов, гуманоидных платформ и бионических протезов. Наша технология — это магнитная матрица, которая встраивается в палец и даёт машине осязание.</p>
+    <p class="lead">Мы находимся на стыке двух миров: тяжёлой промышленности с её требованиями к надёжности и точности, и биологии — с осязанием, нейронными сигналами и протезированием. Именно поэтому наш продукт одинаково нужен и заводу, и производителю гуманоидов, и протезной лаборатории.</p>
+    <div class="badges" style="margin-top:24px;">
+      <span class="badge resident">Резидент КРИТБИ с 09.02.2026</span>
+      <span class="badge resident">Резидент Сколково</span>
+      <span class="badge">Грант «Старт-ИИ» ФСИ (2025–2026)</span>
+    </div>
+  </div>
+</section>
+
+<!-- PROBLEM -->
+<section>
+  <div class="container">
+    <h2>Проблема: слепой робот</h2>
+    <p class="lead">Робот видит предмет, но не чувствует его. Он берёт слишком сильно или роняет, не замечает, что предмет начал выскальзывать. Хрупкие, неформованные и скользящие объекты до сих пор берут люди — потому что у машин не хватает осязания.</p>
+  </div>
+</section>
+
+<!-- SOLUTION -->
+<section id="solution">
+  <div class="container">
+    <h2>Как это работает</h2>
+    <p class="lead">Тактильный датчик встраивается в палец и замыкает цикл «касание → анализ → адаптация». Робот перестаёт действовать вслепую.</p>
+    <div class="steps">
+      <div class="step">
+        <div class="num">01 / КАСАНИЕ</div>
+        <h3>Контакт</h3>
+        <p>Сенсоры определяют момент касания и точку контакта.</p>
+      </div>
+      <div class="step">
+        <div class="num">02 / АНАЛИЗ</div>
+        <h3>Усилие</h3>
+        <p>Микрокоррекция силы сжатия в реальном времени — робот чувствует, с какой силой держит объект.</p>
+      </div>
+      <div class="step">
+        <div class="num">03 / АДАПТАЦИЯ</div>
+        <h3>Форма захвата</h3>
+        <p>Захват меняется под объект, а нейросеть заранее распознаёт начало проскальзывания.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- KPI / HYPOTHESIS -->
+<section>
+  <div class="container">
+    <h2>Потенциальный эффект</h2>
+    <p class="lead">Ниже — ориентиры, которые мы проверяем в пилотах. Это гипотезы, а не гарантированные показатели: реальные цифры зависят от задачи, объекта и условий конкретного производства.</p>
+    <div class="kpi-grid">
+      <div class="kpi">
+        <div class="label">Брак при сложных операциях</div>
+        <div class="value amber">10% → 1,5%</div>
+        <div class="note">Гипотеза. Проверяется в пилотном проекте.</div>
+      </div>
+      <div class="kpi">
+        <div class="label">Точность усилия</div>
+        <div class="value">0,4 Н</div>
+        <div class="note">Гипотеза. Целевой ориентир — 0,1 Н.</div>
+      </div>
+      <div class="kpi">
+        <div class="label">Координата нажатия</div>
+        <div class="value">1 мм</div>
+        <div class="note">Гипотеза. Целевой ориентир — 0,4 мм.</div>
+      </div>
+      <div class="kpi">
+        <div class="label">Частота опроса</div>
+        <div class="value">200–400 Гц</div>
+        <div class="note">Гипотеза. Зависит от конфигурации.</div>
+      </div>
+    </div>
+    <div class="disclaimer">
+      Все числовые показатели на этой странице — предварительные гипотезы проекта, а не публичная оферта и не гарантия результата. Фактический эффект определяется по итогам пилотных испытаний на площадке заказчика.
+    </div>
+  </div>
+</section>
+
+<!-- HISTORY -->
+<section id="history">
+  <div class="container">
+    <h2>История точности</h2>
+    <p class="lead">Пять эпох производства — и один и тот же компромисс между скоростью, ценой и качеством. Тактильный интеллект ломает этот компромисс.</p>
+    <div class="eras">
+      <div class="era">
+        <div class="years mono">1200 → 1600</div>
+        <h3>Ремесло</h3>
+        <p>Идеальное качество, штучный результат, запредельная цена.</p>
+      </div>
+      <div class="era">
+        <div class="years mono">1600 → 1913</div>
+        <h3>Мануфактура</h3>
+        <p>Разделение труда. Производительность выросла, контроль качества слабеет.</p>
+      </div>
+      <div class="era">
+        <div class="years mono">1913 → 1959</div>
+        <h3>Конвейер</h3>
+        <p>Скорость решает всё. Человек стал частью системы.</p>
+      </div>
+      <div class="era">
+        <div class="years mono">1959 → 2025</div>
+        <h3>Слепой робот</h3>
+        <p>Точны, но слепы. Жёсткий алгоритм против гибкой реальности.</p>
+      </div>
+      <div class="era" style="border-color: rgba(0,229,255,0.4);">
+        <div class="years mono">2025 → ...</div>
+        <h3>Тактильный интеллект</h3>
+        <p>Осязание как революция. Брак падает, открываются новые операции.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOR WHOM -->
+<section id="forwhom">
+  <div class="container">
+    <h2>Для кого</h2>
+    <p class="lead">Мы работаем с производителями и интеграторами, которым нужна тактильная чувствительность в их продуктах.</p>
+    <div class="tags">
+      <span class="tag-pill">Промышленная робототехника</span>
+      <span class="tag-pill">Гуманоидные роботы</span>
+      <span class="tag-pill">Бионические протезы</span>
+      <span class="tag-pill">Пищевая промышленность</span>
+      <span class="tag-pill">Ритейл и логистика</span>
+      <span class="tag-pill">Приборостроение</span>
+      <span class="tag-pill">АПК</span>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACTS -->
+<section class="contacts" id="contact">
+  <div class="container">
+    <h2>Свяжитесь с нами</h2>
+    <p>Расскажите о вашей задаче — обсудим, подходит ли наше решение под пилот.</p>
+    <div class="contact-line">Почта: <a href="mailto:info@tactisensor.ru" class="mono">info@tactisensor.ru</a></div>
+    <div class="contact-line">Телефон: <a href="tel:+70000000000" class="mono">+7 (000) 000-00-00</a></div>
+    <a href="mailto:info@tactisensor.ru" class="big-link">Написать нам →</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    ООО «ИнтеллектСистемы» · ОГРН 1252400024986 · ИНН 2464168624 · Резидент КРИТБИ с 09.02.2026 · Резидент Сколково
+  </div>
+</footer>
+
+</body>
+</html>
